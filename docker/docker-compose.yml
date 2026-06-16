@@ -1,0 +1,56 @@
+version: "3.9"
+
+networks:
+  darl-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: darl-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: rate_limiter
+      POSTGRES_USER: darl
+      POSTGRES_PASSWORD: darl_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - redis-data:/data
+    networks:
+      - darl-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U darl -d rate_limiter"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: darl-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - darl-net
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: darl-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@darl.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - darl-net
+    depends_on:
+      postgres:
+        condition: service_healthy

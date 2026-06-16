@@ -1,0 +1,36 @@
+{
+  "groups": [
+    {
+      "name": "darl.rate-limiter",
+      "type": "com.darl.ratelimiter.config.AppProperties",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "darl.rate-limiter.default-algorithm",
+      "type": "java.lang.String",
+      "description": "Default algorithm used when no client-specific config is found in PostgreSQL.",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+    },
+    {
+      "name": "darl.rate-limiter.default-burst-size",
+      "type": "java.lang.Integer",
+      "description": "Max burst size for token bucket algorithm.",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+    },
+    {
+      "name": "darl.rate-limiter.default-rate-per-second",
+      "type": "java.lang.Integer",
+      "description": "Baseline requests\/second for new clients without a config entry.",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+    },
+    {
+      "name": "darl.rate-limiter.default-window-seconds",
+      "type": "java.lang.Integer",
+      "description": "Window length in seconds for sliding\/fixed window algorithms.",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+    }
+  ],
+  "hints": []
+}
