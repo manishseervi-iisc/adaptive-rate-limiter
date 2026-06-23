@@ -8,29 +8,59 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Typed configuration bound to the {@code darl.rate-limiter.*} namespace.
+ * Typed configuration bound to the {@code darl.*} namespace.
  * IntelliJ will autocomplete these keys in application.yml thanks to
  * the spring-boot-configuration-processor dependency.
  */
 @Getter
 @Setter
 @Validated
-@ConfigurationProperties(prefix = "darl.rate-limiter")
+@ConfigurationProperties(prefix = "darl")
 public class AppProperties {
 
-    /** Default algorithm used when no client-specific config is found in PostgreSQL. */
-    @NotBlank
-    private String defaultAlgorithm = "SLIDING_WINDOW";
+    private RateLimiter rateLimiter = new RateLimiter();
+    private Adaptive adaptive = new Adaptive();
+    private ShadowMode shadowMode = new ShadowMode();
 
-    /** Baseline requests/second for new clients without a config entry. */
-    @Min(1)
-    private int defaultRatePerSecond = 100;
+    // ── Nested: rate-limiter ──────────────────────────────────────────────────
 
-    /** Max burst size for token bucket algorithm. */
-    @Min(1)
-    private int defaultBurstSize = 200;
+    @Getter
+    @Setter
+    public static class RateLimiter {
+        @NotBlank
+        private String defaultAlgorithm = "GCRA";
+        @Min(1)
+        private int defaultRatePerSecond = 100;
+        @Min(1)
+        private int defaultBurstSize = 200;
+        @Min(1)
+        private int defaultWindowSeconds = 60;
+    }
 
-    /** Window length in seconds for sliding/fixed window algorithms. */
-    @Min(1)
-    private int defaultWindowSeconds = 60;
+    // ── Nested: adaptive ML layer ─────────────────────────────────────────────
+
+    @Getter
+    @Setter
+    public static class Adaptive {
+        private boolean enabled = true;
+        private String inferenceUrl = "http://localhost:8000";
+        private long cacheTtlSeconds = 300;
+        private int circuitBreakerThreshold = 5;
+    }
+
+    // ── Nested: shadow / A-B mode ─────────────────────────────────────────────
+
+    @Getter
+    @Setter
+    public static class ShadowMode {
+        private boolean enabled = false;
+        private String experimentId = "exp-001";
+    }
+
+    // ── Legacy accessors (backwards compat with existing callers) ─────────────
+
+    public String getDefaultAlgorithm()    { return rateLimiter.defaultAlgorithm; }
+    public int    getDefaultRatePerSecond() { return rateLimiter.defaultRatePerSecond; }
+    public int    getDefaultBurstSize()     { return rateLimiter.defaultBurstSize; }
+    public int    getDefaultWindowSeconds() { return rateLimiter.defaultWindowSeconds; }
 }

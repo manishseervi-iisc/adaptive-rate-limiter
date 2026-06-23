@@ -1,35 +1,79 @@
 {
   "groups": [
     {
-      "name": "darl.rate-limiter",
+      "name": "darl",
       "type": "com.darl.ratelimiter.config.AppProperties",
       "sourceType": "com.darl.ratelimiter.config.AppProperties"
+    },
+    {
+      "name": "darl.adaptive",
+      "type": "com.darl.ratelimiter.config.AppProperties$Adaptive",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties",
+      "sourceMethod": "getAdaptive()"
+    },
+    {
+      "name": "darl.rate-limiter",
+      "type": "com.darl.ratelimiter.config.AppProperties$RateLimiter",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties",
+      "sourceMethod": "getRateLimiter()"
+    },
+    {
+      "name": "darl.shadow-mode",
+      "type": "com.darl.ratelimiter.config.AppProperties$ShadowMode",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties",
+      "sourceMethod": "getShadowMode()"
     }
   ],
   "properties": [
     {
+      "name": "darl.adaptive.cache-ttl-seconds",
+      "type": "java.lang.Long",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
+    },
+    {
+      "name": "darl.adaptive.circuit-breaker-threshold",
+      "type": "java.lang.Integer",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
+    },
+    {
+      "name": "darl.adaptive.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
+    },
+    {
+      "name": "darl.adaptive.inference-url",
+      "type": "java.lang.String",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
+    },
+    {
       "name": "darl.rate-limiter.default-algorithm",
       "type": "java.lang.String",
-      "description": "Default algorithm used when no client-specific config is found in PostgreSQL.",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.rate-limiter.default-burst-size",
       "type": "java.lang.Integer",
-      "description": "Max burst size for token bucket algorithm.",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.rate-limiter.default-rate-per-second",
       "type": "java.lang.Integer",
-      "description": "Baseline requests\/second for new clients without a config entry.",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.rate-limiter.default-window-seconds",
       "type": "java.lang.Integer",
-      "description": "Window length in seconds for sliding\/fixed window algorithms.",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
+    },
+    {
+      "name": "darl.shadow-mode.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$ShadowMode"
+    },
+    {
+      "name": "darl.shadow-mode.experiment-id",
+      "type": "java.lang.String",
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$ShadowMode"
     }
   ],
   "hints": []

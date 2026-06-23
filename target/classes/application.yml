@@ -63,3 +63,13 @@ darl:
     default-rate-per-second: 100
     default-burst-size: 200
     default-window-seconds: 60
+
+  adaptive:
+    enabled: true
+    inference-url: http://localhost:8000
+    cache-ttl-seconds: 300
+    circuit-breaker-threshold: 5
+
+  shadow-mode:
+    enabled: false
+    experiment-id: exp-001

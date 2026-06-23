@@ -8,9 +8,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 /**
- * Configures the async thread pool used for audit log writes.
- * Keeping audit writes on a separate pool means DB slowness
- * never affects the rate-limiting hot path.
+ * Async thread pools.
+ * - auditExecutor:    PostgreSQL audit writes (never blocks HTTP threads)
+ * - adaptiveExecutor: ML inference HTTP calls + Redis cache updates
  */
 @Configuration
 @EnableAsync
@@ -25,6 +25,20 @@ public class AsyncConfig {
         executor.setThreadNamePrefix("audit-");
         executor.setRejectedExecutionHandler(
                 (r, e) -> System.err.println("[Audit] queue full, dropping record")
+        );
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean(name = "adaptiveExecutor")
+    public Executor adaptiveExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("adaptive-");
+        executor.setRejectedExecutionHandler(
+                (r, e) -> System.err.println("[Adaptive] queue full, skipping prediction refresh")
         );
         executor.initialize();
         return executor;
