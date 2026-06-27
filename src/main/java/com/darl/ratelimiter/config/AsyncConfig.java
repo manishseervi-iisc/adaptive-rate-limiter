@@ -43,4 +43,18 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    @Bean(name = "shadowExecutor")
+    public Executor shadowExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(200);
+        executor.setThreadNamePrefix("shadow-");
+        executor.setRejectedExecutionHandler(
+                (r, e) -> System.err.println("[Shadow] queue full, dropping shadow record")
+        );
+        executor.initialize();
+        return executor;
+    }
 }
