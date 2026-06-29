@@ -4,6 +4,7 @@ import com.darl.ratelimiter.adaptive.AdaptiveRateLimitService;
 import com.darl.ratelimiter.audit.AuditService;
 import com.darl.ratelimiter.cache.ClientConfigCache;
 import com.darl.ratelimiter.config.AppProperties;
+import com.darl.ratelimiter.metrics.RateLimitMetricsService;
 import com.darl.ratelimiter.model.ClientConfig;
 import com.darl.ratelimiter.shadow.ShadowModeService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class RateLimitService {
     private final AuditService             auditService;
     private final AdaptiveRateLimitService adaptiveService;
     private final ShadowModeService        shadowModeService;
+    private final RateLimitMetricsService  metricsService;
 
     @Value("${darl.adaptive.enabled:true}")
     private boolean adaptiveEnabled;
@@ -46,7 +48,11 @@ public class RateLimitService {
     public RateLimitResult checkLimit(String clientId) {
         ClientConfig config = configCache.get(clientId)
                 .orElseGet(() -> defaultConfig(clientId));
+        return metricsService.latencyTimer(config.getAlgorithm().name())
+                .record(() -> doCheckLimit(clientId, config));
+    }
 
+    private RateLimitResult doCheckLimit(String clientId, ClientConfig config) {
         int staticLimit    = config.getRatePerSecond();
         int effectiveLimit = resolveLimit(clientId, config);
         RateLimiter limiter = factory.forAlgorithm(config.getAlgorithm());
@@ -58,6 +64,7 @@ public class RateLimitService {
                 effectiveLimit
         );
 
+        metricsService.recordDecision(clientId, result);
         auditService.record(clientId, result);
 
         // Shadow mode: replay with adaptive limit in isolated key space (Day 9)
@@ -85,10 +92,12 @@ public class RateLimitService {
         }
         return adaptiveService.getCachedLimit(clientId)
                 .map(adaptiveLimit -> {
+                    metricsService.recordAdaptiveCacheHit();
                     log.debug("[RateLimitService] using adaptive limit {} for {}", adaptiveLimit, clientId);
                     return adaptiveLimit;
                 })
                 .orElseGet(() -> {
+                    metricsService.recordAdaptiveCacheMiss();
                     adaptiveService.refreshAsync(clientId);
                     return config.getRatePerSecond();
                 });

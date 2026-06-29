@@ -1,6 +1,5 @@
 package com.darl.ratelimiter;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
@@ -11,18 +10,20 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * Verifies the Spring context loads cleanly with real PostgreSQL and Redis
- * instances (via Testcontainers), Flyway runs migrations, and JPA validates
- * the schema.
+ * Day 12: Shared base that starts PostgreSQL and Redis Testcontainers once
+ * per JVM (static fields) and wires them into Spring Boot via @ServiceConnection.
+ *
+ * All integration test classes extend this so containers are reused rather
+ * than started fresh for every test class.
  */
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-class RateLimiterApplicationTests {
+public abstract class IntegrationTestBase {
 
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres =
+    static final PostgreSQLContainer<?> POSTGRES =
             new PostgreSQLContainer<>("postgres:16-alpine")
                     .withDatabaseName("rate_limiter_test")
                     .withUsername("darl")
@@ -30,12 +31,7 @@ class RateLimiterApplicationTests {
 
     @Container
     @ServiceConnection(name = "redis")
-    static GenericContainer<?> redis =
+    static final GenericContainer<?> REDIS =
             new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
                     .withExposedPorts(6379);
-
-    @Test
-    void contextLoads() {
-        // If the context starts, Flyway ran, JPA validated, Postgres + Redis connected.
-    }
 }

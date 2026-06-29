@@ -7,6 +7,8 @@ networks:
 volumes:
   postgres-data:
   redis-data:
+  prometheus-data:
+  grafana-data:
 
 services:
 
@@ -21,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - redis-data:/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - darl-net
     healthcheck:
@@ -36,9 +38,10 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
     networks:
       - darl-net
-
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -54,3 +57,42 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  # ── Observability stack (Day 13) ──────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: darl-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    networks:
+      - darl-net
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: darl-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      # Auto-provision the Prometheus datasource and the DARL dashboard
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - darl-net
+    depends_on:
+      - prometheus

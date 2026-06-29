@@ -40,10 +40,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: distributed_adaptive_rate_limiter
+    distribution:
+      percentiles-histogram:
+        darl.rate_limit.check: true
+      percentiles:
+        darl.rate_limit.check: 0.5,0.95,0.99
   health:
     redis:
       enabled: true

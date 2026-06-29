@@ -1,6 +1,7 @@
 package com.darl.ratelimiter.anomaly;
 
 import com.darl.ratelimiter.audit.AuditLogRepository;
+import com.darl.ratelimiter.metrics.RateLimitMetricsService;
 import com.darl.ratelimiter.model.AnomalyEvent;
 import com.darl.ratelimiter.storage.postgres.AnomalyEventRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class AnomalyDetector {
 
     private final AuditLogRepository auditLogRepository;
     private final AnomalyEventRepository anomalyEventRepository;
+    private final RateLimitMetricsService metricsService;
 
     /** Per-client sliding window of observed RPS values (last ~5 min). */
     private final ConcurrentHashMap<String, Deque<Double>> rpsHistory = new ConcurrentHashMap<>();
@@ -73,6 +75,7 @@ public class AnomalyDetector {
 
         double zScore = (currentRps - mean) / stddev;
         if (zScore > Z_SCORE_THRESHOLD) {
+            metricsService.recordAnomalyEvent(clientId);
             log.warn("[Anomaly] clientId={} z={} rps={} mean={} stddev={}",
                     clientId,
                     String.format("%.2f", zScore),

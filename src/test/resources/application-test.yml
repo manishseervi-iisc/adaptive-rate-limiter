@@ -1,18 +1,27 @@
-# Test profile — PostgreSQL provided by Testcontainers (@ServiceConnection)
-# Redis is disabled in tests for Day 1; will add embedded Redis in Day 3
-
+# Test profile — PostgreSQL and Redis provided by Testcontainers (@ServiceConnection).
 spring:
   flyway:
     enabled: true
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
 
-  # Disable the StartupValidator trying to hit Redis in tests
 darl:
   rate-limiter:
-    default-algorithm: SLIDING_WINDOW
+    default-algorithm: GCRA
+    default-rate-per-second: 10
+    default-burst-size: 20
+    default-window-seconds: 60
+  adaptive:
+    enabled: false
+  shadow-mode:
+    enabled: false
+
+# Disable gRPC server in tests to avoid port conflicts
+grpc:
+  server:
+    port: -1
 
 logging:
   level:

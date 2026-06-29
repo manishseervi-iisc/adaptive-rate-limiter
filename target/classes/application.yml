@@ -57,6 +57,10 @@ logging:
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
+grpc:
+  server:
+    port: 9090
+
 darl:
   rate-limiter:
     default-algorithm: GCRA
@@ -71,5 +75,5 @@ darl:
     circuit-breaker-threshold: 5
 
   shadow-mode:
-    enabled: false
+    enabled: true
     experiment-id: exp-001

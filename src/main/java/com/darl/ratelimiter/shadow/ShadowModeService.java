@@ -1,6 +1,7 @@
 package com.darl.ratelimiter.shadow;
 
 import com.darl.ratelimiter.config.AppProperties;
+import com.darl.ratelimiter.metrics.RateLimitMetricsService;
 import com.darl.ratelimiter.model.ClientConfig;
 import com.darl.ratelimiter.ratelimit.RateLimitResult;
 import com.darl.ratelimiter.ratelimit.RateLimiter;
@@ -31,6 +32,7 @@ public class ShadowModeService {
     private final AbExperimentResultRepository experimentRepository;
     private final RateLimiterFactory rateLimiterFactory;
     private final AppProperties appProperties;
+    private final RateLimitMetricsService metricsService;
 
     /**
      * Run a shadow rate-limit check and persist the comparison record.
@@ -77,6 +79,7 @@ public class ShadowModeService {
                     .build());
 
             if (!decisionStatic.equals(decisionAdaptive)) {
+                metricsService.recordShadowDivergence();
                 log.info("[Shadow] DIVERGENCE clientId={} experimentId={} "
                                 + "staticLimit={} adaptiveLimit={} divergencePct={}% "
                                 + "staticDecision={} adaptiveDecision={}",

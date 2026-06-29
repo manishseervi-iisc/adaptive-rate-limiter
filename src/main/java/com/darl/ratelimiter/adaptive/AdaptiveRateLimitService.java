@@ -1,6 +1,7 @@
 package com.darl.ratelimiter.adaptive;
 
 import com.darl.ratelimiter.audit.AuditLogRepository;
+import com.darl.ratelimiter.metrics.RateLimitMetricsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -38,6 +39,7 @@ public class AdaptiveRateLimitService {
 
     private final StringRedisTemplate redis;
     private final AuditLogRepository auditLogRepository;
+    private final RateLimitMetricsService metricsService;
     private final RestTemplate restTemplate;
     private final String inferenceUrl;
     private final long cacheTtlSeconds;
@@ -50,12 +52,14 @@ public class AdaptiveRateLimitService {
     public AdaptiveRateLimitService(
             StringRedisTemplate redis,
             AuditLogRepository auditLogRepository,
+            RateLimitMetricsService metricsService,
             RestTemplateBuilder builder,
             @Value("${darl.adaptive.inference-url:http://localhost:8000}") String inferenceUrl,
             @Value("${darl.adaptive.cache-ttl-seconds:300}") long cacheTtlSeconds,
             @Value("${darl.adaptive.circuit-breaker-threshold:5}") int circuitBreakerThreshold) {
         this.redis = redis;
         this.auditLogRepository = auditLogRepository;
+        this.metricsService = metricsService;
         this.restTemplate = builder
                 .setConnectTimeout(Duration.ofMillis(500))
                 .setReadTimeout(Duration.ofMillis(800))
@@ -107,6 +111,7 @@ public class AdaptiveRateLimitService {
             log.warn("[Adaptive] inference call failed for {} (failures={}): {}", clientId, failures, e.getMessage());
             if (failures >= circuitBreakerThreshold) {
                 circuitOpenedAt.set(System.currentTimeMillis());
+                metricsService.setCircuitBreakerOpen(true);
                 log.warn("[Adaptive] circuit OPENED after {} consecutive failures", failures);
             }
         } catch (Exception e) {
@@ -123,6 +128,7 @@ public class AdaptiveRateLimitService {
             // Allow one probe request (half-open)
             circuitOpenedAt.set(0L);
             consecutiveFailures.set(0);
+            metricsService.setCircuitBreakerOpen(false);
             log.info("[Adaptive] circuit HALF-OPEN — probing inference service");
             return false;
         }
@@ -168,5 +174,6 @@ public class AdaptiveRateLimitService {
                 cacheTtlSeconds,
                 TimeUnit.SECONDS
         );
+        metricsService.setAdaptiveLimit(clientId, limit);
     }
 }

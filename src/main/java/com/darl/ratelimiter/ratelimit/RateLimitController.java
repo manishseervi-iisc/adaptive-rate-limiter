@@ -2,12 +2,14 @@ package com.darl.ratelimiter.ratelimit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * REST API for rate limit checks.
@@ -34,7 +36,18 @@ public class RateLimitController {
     public ResponseEntity<Map<String, Object>> check(
             @RequestParam String clientId) {
 
+        MDC.put("trace_id",  UUID.randomUUID().toString().replace("-", "").substring(0, 16));
+        MDC.put("client_id", clientId);
+        try {
+            return doCheck(clientId);
+        } finally {
+            MDC.clear();
+        }
+    }
+
+    private ResponseEntity<Map<String, Object>> doCheck(String clientId) {
         RateLimitResult result = rateLimitService.checkLimit(clientId);
+        MDC.put("algorithm", result.getAlgorithm());
 
         HttpHeaders headers = buildHeaders(result);
 
