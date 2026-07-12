@@ -28,62 +28,52 @@
     {
       "name": "darl.adaptive.cache-ttl-seconds",
       "type": "java.lang.Long",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive",
-      "defaultValue": 300
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
     },
     {
       "name": "darl.adaptive.circuit-breaker-threshold",
       "type": "java.lang.Integer",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive",
-      "defaultValue": 5
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
     },
     {
       "name": "darl.adaptive.enabled",
       "type": "java.lang.Boolean",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive",
-      "defaultValue": true
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
     },
     {
       "name": "darl.adaptive.inference-url",
       "type": "java.lang.String",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive",
-      "defaultValue": "http:\/\/localhost:8000"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$Adaptive"
     },
     {
       "name": "darl.rate-limiter.default-algorithm",
       "type": "java.lang.String",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter",
-      "defaultValue": "GCRA"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.rate-limiter.default-burst-size",
       "type": "java.lang.Integer",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter",
-      "defaultValue": 200
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.rate-limiter.default-rate-per-second",
       "type": "java.lang.Integer",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter",
-      "defaultValue": 100
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.rate-limiter.default-window-seconds",
       "type": "java.lang.Integer",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter",
-      "defaultValue": 60
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$RateLimiter"
     },
     {
       "name": "darl.shadow-mode.enabled",
       "type": "java.lang.Boolean",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$ShadowMode",
-      "defaultValue": false
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$ShadowMode"
     },
     {
       "name": "darl.shadow-mode.experiment-id",
       "type": "java.lang.String",
-      "sourceType": "com.darl.ratelimiter.config.AppProperties$ShadowMode",
-      "defaultValue": "exp-001"
+      "sourceType": "com.darl.ratelimiter.config.AppProperties$ShadowMode"
     }
   ],
   "hints": []

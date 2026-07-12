@@ -143,11 +143,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId>
-            <scope>test</scope>
-        </dependency>
+
 
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -161,11 +157,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>redis</artifactId>
-            <scope>test</scope>
-        </dependency>
+
 
     </dependencies>
 
