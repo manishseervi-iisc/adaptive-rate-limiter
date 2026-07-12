@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+// Package used in generated Java class names and the gRPC service descriptor.
+package darl.ratelimit;
+
+option java_package         = "com.darl.ratelimiter.grpc";
+option java_outer_classname = "RateLimitProto";
+option java_multiple_files  = true;
+
+// ---------------------------------------------------------------------------
+// Service definition
+// ---------------------------------------------------------------------------
+
+service RateLimitService {
+    // Attempt to consume one token for the given client.
+    // Returns the same decision data as the REST endpoint.
+    rpc CheckLimit (CheckLimitRequest) returns (CheckLimitResponse);
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+message CheckLimitRequest {
+    // API-key, user-id, IP, or service name
+    string client_id = 1;
+}
+
+message CheckLimitResponse {
+    // true → request may proceed; false → rate limit exceeded (429 equivalent)
+    bool   allowed              = 1;
+    string client_id            = 2;
+    // The limit that was applied (requests per window)
+    int32  limit                = 3;
+    // Remaining requests in the current window
+    int32  remaining            = 4;
+    // Unix epoch second when the current window resets
+    int64  reset_at_epoch_second = 5;
+    // Algorithm that produced this result (GCRA, TOKEN_BUCKET, …)
+    string algorithm            = 6;
+    // Human-readable message ("OK" or "Rate limit exceeded")
+    string message              = 7;
+}
