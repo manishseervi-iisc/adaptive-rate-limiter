@@ -3,9 +3,9 @@ spring:
     name: distributed_adaptive_rate_limiter
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/rate_limiter
-    username: darl
-    password: darl_secret
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/rate_limiter}
+    username: ${SPRING_DATASOURCE_USERNAME:darl}
+    password: ${SPRING_DATASOURCE_PASSWORD:darl_secret}
     driver-class-name: org.postgresql.Driver
     hikari:
       pool-name: darl-pg-pool
@@ -33,8 +33,8 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
 
 management:
   endpoints:
